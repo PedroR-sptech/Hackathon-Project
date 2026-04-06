@@ -1,6 +1,8 @@
 import os
+import logging
 from openai import OpenAI
 
+logger = logging.getLogger(__name__)
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY", ""))
 
 SYSTEM_PROMPT = """You are IntelliAssist, a helpful, friendly, and intelligent AI assistant. 
@@ -25,6 +27,7 @@ def get_ai_response(messages: list[dict]) -> str:
         return response.choices[0].message.content
     except Exception as e:
         error_msg = str(e)
+        logger.error("AI service error: %s", error_msg)
         if "api_key" in error_msg.lower() or "authentication" in error_msg.lower():
             return "⚠️ API key not configured. Please set the OPENAI_API_KEY environment variable in the backend."
-        return f"⚠️ Error communicating with AI service: {error_msg}"
+        return "⚠️ Error communicating with AI service. Please try again later."
